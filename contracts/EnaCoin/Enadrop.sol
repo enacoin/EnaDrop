@@ -12,7 +12,7 @@ uint256 withdraw_value;
 address[] public withdrawed_addresses;
 
 //コンストラクタ
-constructor(address token_contract_address, address pool_owner_address) public payable {
+constructor(address token_contract_address, address pool_owner_address) public {
     token_contract = token_contract_address;
     pool_owner = pool_owner_address;
     withdraw_value = 1;//仮初期値
@@ -30,11 +30,13 @@ function get_pool_owner_address() public view returns (address)
 
 
 //管理者がトークンをプールする
+/* これはあらかじめ approve が必要なので必要なので、このコントラクトに直接直接トークンを送信することでプールしてください
 function pool(uint256 value) external payable
 {
     ERC20Interface token = ERC20Interface(token_contract);
-    token.transfer(this, value);//このコントラクト自身にプールする
+    token.transferFrom(msg.sender, this, value);
 }
+*/
 
 //プール残高は？
 function get_pool_balance() public view returns (uint256)
@@ -48,7 +50,7 @@ function withdraw_all() public
 {
     require(msg.sender==pool_owner);
     ERC20Interface token = ERC20Interface(token_contract);
-    token.transferFrom(this, pool_owner, token.balanceOf(this));
+    token.transfer(pool_owner, token.balanceOf(this));
 }
 
 //引き出し額
